@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spring Boot CRUD Assignment — Library Management</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    color: #1c1c1c;
+    margin: 0 auto;
+    padding: 0 18px;
+    max-width: 920px;
+  }
+  h1 { font-size: 22pt; color: #1f3a5f; margin: 0 0 6pt 0; }
+  h2 { font-size: 15pt; color: #1f3a5f; border-bottom: 2px solid #d6e0ed; padding-bottom: 4pt; margin-top: 22pt; page-break-after: avoid; }
+  h3 { font-size: 12.5pt; color: #244069; margin-top: 16pt; page-break-after: avoid; }
+  h4 { font-size: 11pt; color: #244069; margin-top: 12pt; margin-bottom: 4pt; page-break-after: avoid; }
+  p, li { font-size: 10.5pt; }
+  code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 9pt; background: #f3f5f8; padding: 1px 4px; border-radius: 3px; }
+  pre {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.5pt;
+    line-height: 1.35;
+    background: #f6f8fa;
+    border: 1px solid #d6dee8;
+    border-left: 3px solid #1f6feb;
+    padding: 9px 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    page-break-inside: avoid;
+  }
+  .filename {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.5pt;
+    background: #1f3a5f;
+    color: white;
+    padding: 3px 9px;
+    border-radius: 3px 3px 0 0;
+    display: inline-block;
+    margin-top: 10pt;
+  }
+  .filename + pre { border-top-left-radius: 0; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 8pt 0; font-size: 9.5pt; }
+  th, td { border: 1px solid #c8d2e0; padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: #eef3fa; color: #1f3a5f; }
+
+  .cover {
+    text-align: center;
+    padding: 90pt 0 60pt 0;
+    page-break-after: always;
+  }
+  .cover h1 { font-size: 28pt; margin-bottom: 6pt; }
+  .cover .sub { font-size: 16pt; color: #5a6a80; margin-bottom: 60pt; }
+  .cover .meta { font-size: 12pt; line-height: 2.2; }
+  .cover .meta strong { display: inline-block; width: 160pt; text-align: right; padding-right: 12pt; color: #1f3a5f; }
+  .cover .meta .fill { display: inline-block; min-width: 240pt; border-bottom: 1px dotted #99a3b3; }
+  .page-break { page-break-after: always; }
+  .ascii { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 9.5pt; background: #f6f8fa; padding: 12px; border-radius: 4px; white-space: pre; line-height: 1.4; }
+  .callout {
+    background: #eef6ff;
+    border-left: 3px solid #1f6feb;
+    padding: 8pt 12pt;
+    margin: 10pt 0;
+    border-radius: 3px;
+    font-size: 10pt;
+  }
+  ul, ol { padding-left: 22pt; }
+  li { margin: 3pt 0; }
+  .toc { font-size: 11pt; line-height: 1.9; }
+  .toc .num { display: inline-block; width: 28pt; color: #5a6a80; }
+
+  /* ===== Screenshot replacements ===== */
+  .evidence {
+    margin: 12pt 0;
+    page-break-inside: avoid;
+  }
+  .evidence-title {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #5a6a80;
+    margin-bottom: 4pt;
+    text-transform: uppercase;
+    letter-spacing: 0.6pt;
+  }
+  .evidence-caption {
+    font-size: 9.5pt;
+    color: #5a6a80;
+    margin-top: 5pt;
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* Browser mock */
+  .browser {
+    border: 1px solid #c8d2e0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    background: white;
+  }
+  .browser-bar {
+    background: #e9eef5;
+    border-bottom: 1px solid #c8d2e0;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    font-size: 9pt;
+  }
+  .browser-bar .dots { display: inline-flex; gap: 5px; margin-right: 12px; }
+  .browser-bar .dots span { width: 9px; height: 9px; border-radius: 50%; background: #cfd6e0; display: inline-block; }
+  .browser-bar .dots span:nth-child(1) { background: #ff5f57; }
+  .browser-bar .dots span:nth-child(2) { background: #febc2e; }
+  .browser-bar .dots span:nth-child(3) { background: #28c840; }
+  .browser-bar .url {
+    background: white;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid #c8d2e0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.5pt;
+    color: #244069;
+    flex: 1;
+  }
+  .browser-body { padding: 0; }
+  .browser-body .nav {
+    background: #1f3a5f;
+    color: white;
+    padding: 9px 14px;
+    font-size: 10pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .browser-body .nav a { color: #d6e4f5; margin-left: 14px; text-decoration: none; }
+  .browser-body .nav strong { font-size: 11.5pt; }
+  .browser-body .content { padding: 16px 22px; }
+  .browser-body .content h3 {
+    color: #1f3a5f;
+    border-bottom: 2px solid #e3e9f0;
+    padding-bottom: 6px;
+    margin: 0 0 12pt 0;
+    font-size: 12pt;
+  }
+  .form-row { margin-bottom: 9pt; }
+  .form-row label {
+    display: block;
+    font-weight: 600;
+    color: #1f3a5f;
+    font-size: 9.5pt;
+    margin-bottom: 2pt;
+  }
+  .form-row .input {
+    border: 1px solid #c7d0db;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 9.5pt;
+    background: white;
+    display: block;
+    width: 100%;
+    color: #1c1c1c;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    min-height: 14pt;
+  }
+  .form-row .input.empty { color: #aab3c0; font-style: italic; }
+  .btn-mock {
+    display: inline-block;
+    background: #1f6feb;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 9.5pt;
+    margin-top: 6pt;
+  }
+  .btn-mock.light { background: #e3e9f0; color: #1f3a5f; margin-left: 6pt; }
+
+  table.app-table { font-size: 9pt; margin-top: 8pt; }
+  table.app-table th { background: #eef3fa; font-weight: 600; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.4pt; }
+  table.app-table td { padding: 4px 7px; }
+  table.app-table .actions a { color: #1f6feb; text-decoration: none; }
+
+  /* Terminal block */
+  .terminal {
+    background: #1c2027;
+    color: #d3dae6;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    padding: 12px 14px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    page-break-inside: avoid;
+  }
+  .terminal .prompt { color: #66d9b3; }
+  .terminal .ok    { color: #5fd5a5; }
+  .terminal .err   { color: #ff8a85; }
+  .terminal .info  { color: #89bef0; }
+  .terminal .dim   { color: #7d8795; }
+
+  /* DB / SQL output */
+  .db-output {
+    background: #f6f8fa;
+    border: 1px solid #d6dee8;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    padding: 10px 12px;
+    border-radius: 4px;
+    white-space: pre;
+    overflow-x: auto;
+    page-break-inside: avoid;
+  }
+
+  /* Error page mock */
+  .error-block {
+    border-left: 4px solid #c0392b;
+    padding: 10px 14px;
+    background: #fdf3f1;
+    border-radius: 4px;
+  }
+  .error-block h4 { color: #1f3a5f; margin: 0 0 6pt 0; font-size: 11pt; }
+  .error-block .err-detail {
+    background: white;
+    border: 1px solid #f1d4cf;
+    padding: 8px 10px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 8.5pt;
+    border-radius: 3px;
+    margin-top: 6pt;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<!-- =================== COVER =================== -->
+<section class="cover">
+  <h1>Spring Boot CRUD Application</h1>
+  <div class="sub">Library Management — Authors &amp; Books</div>
+
+  <div class="meta">
+    <div><strong>Name:</strong> <span class="fill">&nbsp;</span></div>
+    <div><strong>Register Number:</strong> <span class="fill">&nbsp;</span></div>
+    <div><strong>Course / Subject:</strong> <span class="fill">&nbsp;</span></div>
+    <div><strong>Date:</strong> <span class="fill">&nbsp;</span></div>
+    <div><strong>GitHub URL:</strong> <span class="fill">&nbsp;</span></div>
+  </div>
+</section>
+
+<!-- =================== TABLE OF CONTENTS =================== -->
+<h2>Table of Contents</h2>
+<div class="toc">
+  <div><span class="num">1.</span> Introduction &amp; Tech Stack</div>
+  <div><span class="num">2.</span> Entity Relationship Design</div>
+  <div><span class="num">3.</span> Project Structure</div>
+  <div><span class="num">4.</span> Implementation Details (Code + Output)</div>
+  <div style="margin-left: 24pt;"><span class="num">4.1</span> Populating the Database</div>
+  <div style="margin-left: 24pt;"><span class="num">4.2</span> Create Operation</div>
+  <div style="margin-left: 24pt;"><span class="num">4.3</span> Read Operation (with INNER JOIN)</div>
+  <div style="margin-left: 24pt;"><span class="num">4.4</span> Update Operation</div>
+  <div style="margin-left: 24pt;"><span class="num">4.5</span> Exception Handling</div>
+  <div><span class="num">5.</span> Testing (JUnit + Mockito)</div>
+  <div><span class="num">6.</span> Challenges Faced</div>
+  <div><span class="num">7.</span> How to Run</div>
+  <div><span class="num">8.</span> GitHub Repository</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- =================== 1. INTRODUCTION =================== -->
+<h2>1. Introduction &amp; Tech Stack</h2>
+
+<p>
+This project is a Spring Boot 3 web application that manages two related entities —
+<strong>Author</strong> and <strong>Book</strong> — using Spring MVC, Spring Data JPA, and an
+in-memory H2 database. It implements <strong>Create</strong>, <strong>Read</strong>, and
+<strong>Update</strong> operations through JSP forms, a custom repository
+<strong>INNER&nbsp;JOIN</strong> query, exception handling for integrity violations, and a
+suite of unit tests using JUnit 5 and Mockito.
+</p>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th></tr>
+  <tr><td>Language / Runtime</td><td>Java 21</td></tr>
+  <tr><td>Framework</td><td>Spring Boot 3.3.5 (Spring MVC + Spring Data JPA)</td></tr>
+  <tr><td>ORM</td><td>Hibernate (auto-configured)</td></tr>
+  <tr><td>Database</td><td>H2 (in-memory)</td></tr>
+  <tr><td>View Layer</td><td>JSP + JSTL (Jakarta)</td></tr>
+  <tr><td>Build</td><td>Maven 3.9</td></tr>
+  <tr><td>Testing</td><td>JUnit 5, Mockito, AssertJ, Spring Boot Test</td></tr>
+</table>
+
+<!-- =================== 2. ER DESIGN =================== -->
+<h2>2. Entity Relationship Design</h2>
+
+<p>
+The application defines two JPA entities related by a <strong>One-to-Many</strong>
+association: one <code>Author</code> has many <code>Book</code>s, and each
+<code>Book</code> belongs to exactly one <code>Author</code>. The
+<code>Book.isbn</code> column carries a database-level <code>UNIQUE</code> constraint —
+this is the constraint that demonstrates the integrity-violation exception handling.
+</p>
+
+<div class="ascii">
+┌──────────────────┐ 1        * ┌──────────────────┐
+│      Author      │────────────│       Book       │
+├──────────────────┤             ├──────────────────┤
+│ id        (PK)   │             │ id        (PK)   │
+│ name             │             │ title            │
+│ nationality      │             │ isbn      (U)    │
+│ birth_year       │             │ price            │
+│                  │             │ author_id (FK)   │
+└──────────────────┘             └──────────────────┘
+</div>
+
+<table>
+  <tr><th>Entity</th><th>Attribute</th><th>JPA / Constraint</th></tr>
+  <tr><td rowspan="4">Author</td><td>id</td><td>@Id, @GeneratedValue(IDENTITY)</td></tr>
+  <tr><td>name</td><td>@Column(nullable=false), @NotBlank</td></tr>
+  <tr><td>nationality</td><td>@Column(nullable=false), @NotBlank</td></tr>
+  <tr><td>birthYear</td><td>@Column(name="birth_year", nullable=false), @Min(1000)</td></tr>
+  <tr><td rowspan="4">Book</td><td>title</td><td>@Column(nullable=false), @NotBlank</td></tr>
+  <tr><td>isbn</td><td>@Column(nullable=false, <strong>unique=true</strong>), @NotBlank</td></tr>
+  <tr><td>price</td><td>@Column(nullable=false, precision=8, scale=2), @Positive</td></tr>
+  <tr><td>author</td><td>@ManyToOne(optional=false), @JoinColumn(name="author_id")</td></tr>
+</table>
+
+<!-- =================== 3. PROJECT STRUCTURE =================== -->
+<h2>3. Project Structure</h2>
+
+<div class="ascii">
+spring_project/
+├── pom.xml
+├── README.md
+└── src/
+    ├── main/
+    │   ├── java/com/example/library/
+    │   │   ├── LibraryApplication.java
+    │   │   ├── entity/      Author.java, Book.java
+    │   │   ├── repository/  AuthorRepository.java, BookRepository.java
+    │   │   ├── service/     AuthorService.java,    BookService.java
+    │   │   ├── controller/  HomeController, AuthorController, BookController
+    │   │   ├── dto/         BookWithAuthor.java
+    │   │   └── exception/   GlobalExceptionHandler.java
+    │   ├── resources/
+    │   │   ├── application.properties
+    │   │   ├── data.sql
+    │   │   └── static/css/styles.css
+    │   └── webapp/WEB-INF/jsp/
+    │       ├── common/header.jsp, footer.jsp
+    │       ├── books/list.jsp, form.jsp
+    │       ├── authors/list.jsp, form.jsp
+    │       └── error.jsp
+    └── test/java/com/example/library/
+        ├── repository/BookRepositoryTest.java
+        └── service/   BookServiceTest.java, AuthorServiceTest.java
+</div>
+
+<h3>3.1 Maven Dependencies (<code>pom.xml</code>)</h3>
+<span class="filename">pom.xml</span>
+<pre>&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;3.3.5&lt;/version&gt;
+&lt;/parent&gt;
+
+&lt;properties&gt;
+    &lt;java.version&gt;21&lt;/java.version&gt;
+&lt;/properties&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;&lt;/dependency&gt;
+    &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;&lt;/dependency&gt;
+    &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;&lt;/dependency&gt;
+
+    &lt;!-- JSP support --&gt;
+    &lt;dependency&gt;&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+        &lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt;&lt;scope&gt;provided&lt;/scope&gt;&lt;/dependency&gt;
+    &lt;dependency&gt;&lt;groupId&gt;jakarta.servlet.jsp.jstl&lt;/groupId&gt;
+        &lt;artifactId&gt;jakarta.servlet.jsp.jstl-api&lt;/artifactId&gt;&lt;/dependency&gt;
+    &lt;dependency&gt;&lt;groupId&gt;org.glassfish.web&lt;/groupId&gt;
+        &lt;artifactId&gt;jakarta.servlet.jsp.jstl&lt;/artifactId&gt;&lt;version&gt;3.0.1&lt;/version&gt;&lt;/dependency&gt;
+
+    &lt;!-- DB and tests --&gt;
+    &lt;dependency&gt;&lt;groupId&gt;com.h2database&lt;/groupId&gt;
+        &lt;artifactId&gt;h2&lt;/artifactId&gt;&lt;scope&gt;runtime&lt;/scope&gt;&lt;/dependency&gt;
+    &lt;dependency&gt;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;&lt;scope&gt;test&lt;/scope&gt;&lt;/dependency&gt;
+&lt;/dependencies&gt;</pre>
+
+<div class="page-break"></div>
+
+<!-- =================== 4. IMPLEMENTATION =================== -->
+<h2>4. Implementation Details</h2>
+
+<h3>4.1 Populating the Database</h3>
+
+<p>
+The schema is generated automatically by Hibernate from the JPA entity annotations
+(<code>spring.jpa.hibernate.ddl-auto=create-drop</code>). The file
+<code>src/main/resources/data.sql</code> seeds <strong>10 authors</strong> and
+<strong>10 books</strong>. The setting
+<code>spring.jpa.defer-datasource-initialization=true</code> ensures
+<code>data.sql</code> runs <em>after</em> Hibernate has created the tables.
+</p>
+
+<span class="filename">src/main/resources/application.properties</span>
+<pre># ===== Server =====
+server.port=8085
+
+# ===== Datasource (H2 in-memory) =====
+spring.datasource.url=jdbc:h2:mem:librarydb;DB_CLOSE_DELAY=-1;MODE=LEGACY
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+# ===== H2 Console =====
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# ===== JPA / Hibernate =====
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Run data.sql AFTER Hibernate creates the schema
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=always
+
+# ===== JSP view resolver =====
+spring.mvc.view.prefix=/WEB-INF/jsp/
+spring.mvc.view.suffix=.jsp</pre>
+
+<span class="filename">src/main/resources/data.sql</span>
+<pre>-- 10 Authors
+INSERT INTO author (name, nationality, birth_year) VALUES ('George Orwell',          'British',   1903);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Jane Austen',            'British',   1775);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Mark Twain',             'American',  1835);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Leo Tolstoy',            'Russian',   1828);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Gabriel Garcia Marquez', 'Colombian', 1927);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Haruki Murakami',        'Japanese',  1949);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Chinua Achebe',          'Nigerian',  1930);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Virginia Woolf',         'British',   1882);
+INSERT INTO author (name, nationality, birth_year) VALUES ('Ernest Hemingway',       'American',  1899);
+INSERT INTO author (name, nationality, birth_year) VALUES ('R. K. Narayan',          'Indian',    1906);
+
+-- 10 Books (some authors have multiple books, some have none -- demonstrates INNER JOIN behaviour)
+INSERT INTO book (title, isbn, price, author_id) VALUES ('1984',                            '978-0451524935',  9.99, 1);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('Animal Farm',                     '978-0451526342',  7.50, 1);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('Pride and Prejudice',             '978-0141439518',  6.95, 2);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('The Adventures of Tom Sawyer',    '978-0143039563',  8.25, 3);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('War and Peace',                   '978-0199232765', 14.50, 4);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('Anna Karenina',                   '978-0143035008', 12.00, 4);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('One Hundred Years of Solitude',   '978-0060883287', 11.99, 5);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('Norwegian Wood',                  '978-0375704024', 10.99, 6);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('Things Fall Apart',               '978-0385474542',  9.50, 7);
+INSERT INTO book (title, isbn, price, author_id) VALUES ('Malgudi Days',                    '978-0140185430',  7.75, 10);</pre>
+
+<div class="evidence">
+  <div class="evidence-title">Output 1 — H2 console at <code>/h2-console</code> after startup</div>
+  <pre class="db-output">SELECT id, name, nationality, birth_year FROM AUTHOR;
+
+ID | NAME                    | NATIONALITY | BIRTH_YEAR
+---+-------------------------+-------------+-----------
+ 1 | George Orwell           | British     |       1903
+ 2 | Jane Austen             | British     |       1775
+ 3 | Mark Twain              | American    |       1835
+ 4 | Leo Tolstoy             | Russian     |       1828
+ 5 | Gabriel Garcia Marquez  | Colombian   |       1927
+ 6 | Haruki Murakami         | Japanese    |       1949
+ 7 | Chinua Achebe           | Nigerian    |       1930
+ 8 | Virginia Woolf          | British     |       1882
+ 9 | Ernest Hemingway        | American    |       1899
+10 | R. K. Narayan           | Indian      |       1906
+(10 rows)
+
+
+SELECT id, title, isbn, price, author_id FROM BOOK;
+
+ID | TITLE                          | ISBN           | PRICE | AUTHOR_ID
+---+--------------------------------+----------------+-------+----------
+ 1 | 1984                           | 978-0451524935 |  9.99 |     1
+ 2 | Animal Farm                    | 978-0451526342 |  7.50 |     1
+ 3 | Pride and Prejudice            | 978-0141439518 |  6.95 |     2
+ 4 | The Adventures of Tom Sawyer   | 978-0143039563 |  8.25 |     3
+ 5 | War and Peace                  | 978-0199232765 | 14.50 |     4
+ 6 | Anna Karenina                  | 978-0143035008 | 12.00 |     4
+ 7 | One Hundred Years of Solitude  | 978-0060883287 | 11.99 |     5
+ 8 | Norwegian Wood                 | 978-0375704024 | 10.99 |     6
+ 9 | Things Fall Apart              | 978-0385474542 |  9.50 |     7
+10 | Malgudi Days                   | 978-0140185430 |  7.75 |    10
+(10 rows)</pre>
+  <div class="evidence-caption">Both tables are populated with exactly 10 rows each on every startup.</div>
+</div>
+
+<h4>Entity classes</h4>
+
+<span class="filename">src/main/java/com/example/library/entity/Author.java</span>
+<pre>@Entity
+@Table(name = "author")
+public class Author {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Name is required")
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @NotBlank(message = "Nationality is required")
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
+    private String nationality;
+
+    @Min(value = 1000, message = "Birth year must be a 4-digit year")
+    @Column(name = "birth_year", nullable = false)
+    private int birthYear;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;Book&gt; books = new ArrayList&lt;&gt;();
+
+    // constructors, getters and setters omitted for brevity
+}</pre>
+
+<span class="filename">src/main/java/com/example/library/entity/Book.java</span>
+<pre>@Entity
+@Table(name = "book")
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(max = 150)
+    @Column(nullable = false, length = 150)
+    private String title;
+
+    @NotBlank(message = "ISBN is required")
+    @Size(max = 20)
+    @Column(nullable = false, unique = true, length = 20)
+    private String isbn;
+
+    @NotNull
+    @Positive(message = "Price must be greater than 0")
+    @Column(nullable = false, precision = 8, scale = 2)
+    private BigDecimal price;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
+
+    // constructors, getters and setters omitted for brevity
+}</pre>
+
+<div class="page-break"></div>
+
+<!-- =================== 4.2 CREATE =================== -->
+<h3>4.2 Create Operation</h3>
+
+<p>
+The Add Book form is rendered by <code>BookController.newForm</code> and submitted
+to <code>BookController.create</code>. Bean-Validation annotations on the entity
+(<code>@NotBlank</code>, <code>@Positive</code>) are checked automatically; field
+errors render via <code>&lt;form:errors&gt;</code>. The same pattern is used for Authors.
+</p>
+
+<span class="filename">BookController.java — create methods</span>
+<pre>@GetMapping("/new")
+public String newForm(Model model) {
+    model.addAttribute("book", new Book());
+    model.addAttribute("authors", authorService.findAll());
+    model.addAttribute("mode", "new");
+    return "books/form";
+}
+
+@PostMapping
+public String create(@Valid @ModelAttribute("book") Book book,
+                     BindingResult bindingResult,
+                     @RequestParam(value = "authorId", required = false) Long authorId,
+                     Model model) {
+    if (authorId == null) {
+        bindingResult.rejectValue("author", "author.required", "Please select an author");
+    }
+    if (bindingResult.hasErrors()) {
+        model.addAttribute("authors", authorService.findAll());
+        model.addAttribute("mode", "new");
+        return "books/form";
+    }
+    bookService.create(book, authorId);
+    return "redirect:/books";
+}</pre>
+
+<span class="filename">BookService.java — create method</span>
+<pre>public Book create(Book book, Long authorId) {
+    Author author = authorRepository.findById(authorId)
+            .orElseThrow(() -&gt; new IllegalArgumentException("Author not found: id=" + authorId));
+    book.setAuthor(author);
+    return bookRepository.save(book);
+}</pre>
+
+<div class="evidence">
+  <div class="evidence-title">Output 2 — Add Book form rendered at <code>GET /books/new</code></div>
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dots"><span></span><span></span><span></span></span>
+      <span class="url">http://localhost:8085/books/new</span>
+    </div>
+    <div class="browser-body">
+      <div class="nav"><strong>Library Management</strong><span><a>Books</a><a>Authors</a><a>H2 Console</a></span></div>
+      <div class="content">
+        <h3>Add Book</h3>
+        <div class="form-row"><label>Title</label><span class="input empty">(empty)</span></div>
+        <div class="form-row"><label>ISBN (must be unique)</label><span class="input empty">(empty)</span></div>
+        <div class="form-row"><label>Price (USD)</label><span class="input empty">(empty)</span></div>
+        <div class="form-row"><label>Author</label><span class="input">▾ -- Select an author --</span></div>
+        <span class="btn-mock">Create Book</span><span class="btn-mock light">Cancel</span>
+      </div>
+    </div>
+  </div>
+  <div class="evidence-caption">Empty form. Validation errors appear inline below each field.</div>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Output 3 — Same form filled in with a new book</div>
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dots"><span></span><span></span><span></span></span>
+      <span class="url">http://localhost:8085/books/new</span>
+    </div>
+    <div class="browser-body">
+      <div class="nav"><strong>Library Management</strong><span><a>Books</a><a>Authors</a><a>H2 Console</a></span></div>
+      <div class="content">
+        <h3>Add Book</h3>
+        <div class="form-row"><label>Title</label><span class="input">Brave New World</span></div>
+        <div class="form-row"><label>ISBN (must be unique)</label><span class="input">978-0060850524</span></div>
+        <div class="form-row"><label>Price (USD)</label><span class="input">11.50</span></div>
+        <div class="form-row"><label>Author</label><span class="input">▾ George Orwell</span></div>
+        <span class="btn-mock">Create Book</span><span class="btn-mock light">Cancel</span>
+      </div>
+    </div>
+  </div>
+  <div class="evidence-caption">A new book ready to be submitted via <code>POST /books</code>.</div>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Output 4 — HTTP trace verifying the row is persisted and the list grows</div>
+  <pre class="terminal"><span class="prompt">$</span> curl -i -X POST http://localhost:8085/books \
+       -d <span class="info">"title=Brave New World&amp;isbn=978-0060850524&amp;price=11.50&amp;authorId=1"</span>
+<span class="ok">HTTP/1.1 302</span>
+Location: http://localhost:8085/books
+
+<span class="prompt">$</span> curl -s http://localhost:8085/books | grep -c '/edit'
+<span class="ok">11</span>     <span class="dim"># the list grew from 10 to 11 rows</span></pre>
+  <div class="evidence-caption">Server replies with <code>302</code> redirect to <code>/books</code>; the list size goes from <strong>10 → 11</strong>.</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- =================== 4.3 READ (INNER JOIN) =================== -->
+<h3>4.3 Read Operation — with custom INNER JOIN query</h3>
+
+<p>
+The Books list is produced by a custom JPQL query that performs an
+<strong>INNER JOIN</strong> between <code>Book</code> and <code>Author</code>
+and projects the result directly into the <code>BookWithAuthor</code> DTO using
+JPQL's <code>SELECT new ...</code> constructor expression. This avoids the N+1
+query problem that would occur with a naive <code>List&lt;Book&gt;</code>
+followed by lazy <code>book.getAuthor().getName()</code> calls.
+</p>
+
+<span class="filename">BookRepository.java</span>
+<pre>@Repository
+public interface BookRepository extends JpaRepository&lt;Book, Long&gt; {
+
+    @Query("""
+            SELECT new com.example.library.dto.BookWithAuthor(
+                b.id, b.title, b.isbn, b.price, a.name, a.nationality)
+            FROM Book b INNER JOIN b.author a
+            ORDER BY a.name, b.title
+            """)
+    List&lt;BookWithAuthor&gt; findAllBooksWithAuthor();
+}</pre>
+
+<span class="filename">BookWithAuthor.java (DTO)</span>
+<pre>public class BookWithAuthor {
+    private final Long bookId;
+    private final String title;
+    private final String isbn;
+    private final BigDecimal price;
+    private final String authorName;
+    private final String authorNationality;
+
+    public BookWithAuthor(Long bookId, String title, String isbn, BigDecimal price,
+                          String authorName, String authorNationality) {
+        this.bookId = bookId;
+        this.title = title;
+        this.isbn = isbn;
+        this.price = price;
+        this.authorName = authorName;
+        this.authorNationality = authorNationality;
+    }
+    // getters omitted
+}</pre>
+
+<div class="callout">
+  <strong>Generated SQL (from Hibernate <code>show_sql</code>):</strong><br>
+  <code>SELECT b1_0.id, b1_0.title, b1_0.isbn, b1_0.price, a1_0.name, a1_0.nationality
+  FROM book b1_0 JOIN author a1_0 ON a1_0.id = b1_0.author_id
+  ORDER BY a1_0.name, b1_0.title</code> — confirms an INNER JOIN at the SQL level.
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Output 5 — Books list at <code>GET /books</code> (the inner-join view)</div>
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dots"><span></span><span></span><span></span></span>
+      <span class="url">http://localhost:8085/books</span>
+    </div>
+    <div class="browser-body">
+      <div class="nav"><strong>Library Management</strong><span><a>Books</a><a>Authors</a><a>H2 Console</a></span></div>
+      <div class="content">
+        <h3>Books</h3>
+        <p style="font-size:9pt; color:#5a6a80; margin:-6pt 0 8pt 0;">Total: <strong>10</strong> &nbsp;·&nbsp; Produced by INNER JOIN between Book and Author.</p>
+        <table class="app-table">
+          <tr><th>#</th><th>Title</th><th>ISBN</th><th>Price</th><th>Author</th><th>Nationality</th><th>Actions</th></tr>
+          <tr><td>1</td><td>Things Fall Apart</td><td>978-0385474542</td><td>$9.50</td><td>Chinua Achebe</td><td>Nigerian</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>2</td><td>One Hundred Years of Solitude</td><td>978-0060883287</td><td>$11.99</td><td>Gabriel Garcia Marquez</td><td>Colombian</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>3</td><td>1984</td><td>978-0451524935</td><td>$9.99</td><td>George Orwell</td><td>British</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>4</td><td>Animal Farm</td><td>978-0451526342</td><td>$7.50</td><td>George Orwell</td><td>British</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>5</td><td>Norwegian Wood</td><td>978-0375704024</td><td>$10.99</td><td>Haruki Murakami</td><td>Japanese</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>6</td><td>Pride and Prejudice</td><td>978-0141439518</td><td>$6.95</td><td>Jane Austen</td><td>British</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>7</td><td>Anna Karenina</td><td>978-0143035008</td><td>$12.00</td><td>Leo Tolstoy</td><td>Russian</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>8</td><td>War and Peace</td><td>978-0199232765</td><td>$14.50</td><td>Leo Tolstoy</td><td>Russian</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>9</td><td>The Adventures of Tom Sawyer</td><td>978-0143039563</td><td>$8.25</td><td>Mark Twain</td><td>American</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>10</td><td>Malgudi Days</td><td>978-0140185430</td><td>$7.75</td><td>R. K. Narayan</td><td>Indian</td><td class="actions"><a>Edit</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="evidence-caption">All 10 books rendered with their author's name and nationality, ordered by author name then title — exactly the JPQL <code>ORDER BY a.name, b.title</code>. Note that <strong>Virginia Woolf</strong> and <strong>Ernest Hemingway</strong> have no books seeded and therefore do <em>not</em> appear here — confirming inner-join semantics.</div>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Output 6 — Authors list at <code>GET /authors</code></div>
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dots"><span></span><span></span><span></span></span>
+      <span class="url">http://localhost:8085/authors</span>
+    </div>
+    <div class="browser-body">
+      <div class="nav"><strong>Library Management</strong><span><a>Books</a><a>Authors</a><a>H2 Console</a></span></div>
+      <div class="content">
+        <h3>Authors</h3>
+        <table class="app-table">
+          <tr><th>#</th><th>Name</th><th>Nationality</th><th>Birth Year</th><th># of Books</th><th>Actions</th></tr>
+          <tr><td>1</td><td>George Orwell</td><td>British</td><td>1903</td><td>2</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>2</td><td>Jane Austen</td><td>British</td><td>1775</td><td>1</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>3</td><td>Mark Twain</td><td>American</td><td>1835</td><td>1</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>4</td><td>Leo Tolstoy</td><td>Russian</td><td>1828</td><td>2</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>5</td><td>Gabriel Garcia Marquez</td><td>Colombian</td><td>1927</td><td>1</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>6</td><td>Haruki Murakami</td><td>Japanese</td><td>1949</td><td>1</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>7</td><td>Chinua Achebe</td><td>Nigerian</td><td>1930</td><td>1</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>8</td><td>Virginia Woolf</td><td>British</td><td>1882</td><td>0</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>9</td><td>Ernest Hemingway</td><td>American</td><td>1899</td><td>0</td><td class="actions"><a>Edit</a></td></tr>
+          <tr><td>10</td><td>R. K. Narayan</td><td>Indian</td><td>1906</td><td>1</td><td class="actions"><a>Edit</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="evidence-caption">All 10 authors. The <em># of Books</em> column comes from the <code>@OneToMany</code> back-reference on <code>Author.books</code>.</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- =================== 4.4 UPDATE =================== -->
+<h3>4.4 Update Operation</h3>
+
+<p>
+The Edit form is pre-populated with the existing row's values
+(<code>BookController.editForm</code>), and the submission handler
+(<code>BookController.update</code>) loads the existing entity, overwrites the
+fields, and saves it back. Validation is identical to the create flow.
+</p>
+
+<span class="filename">BookController.java — edit and update methods</span>
+<pre>@GetMapping("/{id}/edit")
+public String editForm(@PathVariable Long id, Model model) {
+    Book book = bookService.findById(id);
+    model.addAttribute("book", book);
+    model.addAttribute("authors", authorService.findAll());
+    model.addAttribute("selectedAuthorId", book.getAuthor().getId());
+    model.addAttribute("mode", "edit");
+    return "books/form";
+}
+
+@PostMapping("/{id}")
+public String update(@PathVariable Long id,
+                     @Valid @ModelAttribute("book") Book book,
+                     BindingResult bindingResult,
+                     @RequestParam(value = "authorId", required = false) Long authorId,
+                     Model model) {
+    if (authorId == null) {
+        bindingResult.rejectValue("author", "author.required", "Please select an author");
+    }
+    if (bindingResult.hasErrors()) {
+        model.addAttribute("authors", authorService.findAll());
+        model.addAttribute("selectedAuthorId", authorId);
+        model.addAttribute("mode", "edit");
+        return "books/form";
+    }
+    bookService.update(id, book, authorId);
+    return "redirect:/books";
+}</pre>
+
+<span class="filename">BookService.java — update method</span>
+<pre>public Book update(Long id, Book updated, Long authorId) {
+    Book existing = findById(id);
+    Author author = authorRepository.findById(authorId)
+            .orElseThrow(() -&gt; new IllegalArgumentException("Author not found: id=" + authorId));
+    existing.setTitle(updated.getTitle());
+    existing.setIsbn(updated.getIsbn());
+    existing.setPrice(updated.getPrice());
+    existing.setAuthor(author);
+    return bookRepository.save(existing);
+}</pre>
+
+<div class="evidence">
+  <div class="evidence-title">Output 7 — Edit form pre-populated for book <code>id=1</code></div>
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dots"><span></span><span></span><span></span></span>
+      <span class="url">http://localhost:8085/books/1/edit</span>
+    </div>
+    <div class="browser-body">
+      <div class="nav"><strong>Library Management</strong><span><a>Books</a><a>Authors</a><a>H2 Console</a></span></div>
+      <div class="content">
+        <h3>Edit Book</h3>
+        <div class="form-row"><label>Title</label><span class="input">1984</span></div>
+        <div class="form-row"><label>ISBN (must be unique)</label><span class="input">978-0451524935</span></div>
+        <div class="form-row"><label>Price (USD)</label><span class="input">9.99</span></div>
+        <div class="form-row"><label>Author</label><span class="input">▾ George Orwell &nbsp;<span style="color:#28c840;">✓ selected</span></span></div>
+        <span class="btn-mock">Update Book</span><span class="btn-mock light">Cancel</span>
+      </div>
+    </div>
+  </div>
+  <div class="evidence-caption">The form is filled in from the database row; the correct author is pre-selected in the dropdown.</div>
+</div>
+
+<div class="evidence">
+  <div class="evidence-title">Output 8 — Before / After — book <code>id=1</code> updated to title <em>"Nineteen Eighty-Four"</em>, price <em>$12.99</em></div>
+  <table>
+    <tr><th>State</th><th>Title</th><th>ISBN</th><th>Price</th><th>Author</th></tr>
+    <tr><td>Before update</td><td>1984</td><td>978-0451524935</td><td>$9.99</td><td>George Orwell</td></tr>
+    <tr><td>After update</td><td><strong>Nineteen Eighty-Four</strong></td><td>978-0451524935</td><td><strong>$12.99</strong></td><td>George Orwell</td></tr>
+  </table>
+  <pre class="terminal"><span class="prompt">$</span> curl -i -X POST http://localhost:8085/books/1 \
+       -d <span class="info">"title=Nineteen Eighty-Four&amp;isbn=978-0451524935&amp;price=12.99&amp;authorId=1"</span>
+<span class="ok">HTTP/1.1 302</span>
+Location: http://localhost:8085/books
+
+<span class="prompt">$</span> curl -s http://localhost:8085/books | grep -E "Nineteen|12.99"
+            &lt;td&gt;<span class="ok">Nineteen Eighty-Four</span>&lt;/td&gt;
+            &lt;td&gt;<span class="ok">$12.99</span>&lt;/td&gt;</pre>
+  <div class="evidence-caption">Update succeeds (HTTP 302), and the list view confirms the change.</div>
+</div>
+
+<!-- =================== 4.5 EXCEPTION HANDLING =================== -->
+<h3>4.5 Exception Handling — Integrity Violations</h3>
+
+<p>
+A <code>@ControllerAdvice</code> bean catches
+<code>DataIntegrityViolationException</code> raised by Hibernate (for example
+when the user tries to insert a book whose ISBN already exists) and renders a
+clean error page instead of a stack trace.
+</p>
+
+<span class="filename">GlobalExceptionHandler.java</span>
+<pre>@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public String handleIntegrityViolation(DataIntegrityViolationException ex, Model model) {
+        String rootMessage = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage()
+                : ex.getMessage();
+        model.addAttribute("title", "Data Integrity Violation");
+        model.addAttribute("message",
+                "The operation could not be completed because it would break a database constraint "
+                        + "(for example: a duplicate ISBN, or a missing author).");
+        model.addAttribute("detail", rootMessage);
+        return "error";
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleIllegalArgument(IllegalArgumentException ex, Model model) {
+        model.addAttribute("title", "Invalid Request");
+        model.addAttribute("message", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleGeneric(Exception ex, Model model) {
+        model.addAttribute("title", "Unexpected Error");
+        model.addAttribute("message", "Something went wrong while processing your request.");
+        model.addAttribute("detail", ex.getMessage());
+        return "error";
+    }
+}</pre>
+
+<div class="evidence">
+  <div class="evidence-title">Output 9 — Submitting an existing ISBN triggers the friendly error page</div>
+  <pre class="terminal"><span class="prompt">$</span> curl -s -X POST http://localhost:8085/books \
+       -d <span class="info">"title=Duplicate&amp;isbn=978-0451524935&amp;price=5.00&amp;authorId=2"</span>
+       | grep -E <span class="info">"Data Integrity|Unique"</span>
+    &lt;h2&gt;<span class="err">Data Integrity Violation</span>&lt;/h2&gt;
+    &lt;p&gt;The operation could not be completed because it would break
+       a database constraint (for example: a duplicate ISBN, or a
+       missing author).&lt;/p&gt;
+    &lt;pre&gt;<span class="err">Unique index or primary key violation: "PUBLIC.CONSTRAINT_INDEX_1
+       ON PUBLIC.BOOK(ISBN NULLS FIRST) VALUES ( /* 1 */ '978-0451524935' )"</span>;&lt;/pre&gt;</pre>
+  <div class="error-block">
+    <h4>Data Integrity Violation</h4>
+    <p>The operation could not be completed because it would break a database constraint (for example: a duplicate ISBN, or a missing author).</p>
+    <div class="err-detail">Unique index or primary key violation: "PUBLIC.CONSTRAINT_INDEX_1 ON PUBLIC.BOOK(ISBN NULLS FIRST) VALUES ( /* 1 */ '978-0451524935' )"</div>
+    <span class="btn-mock">Back to Books</span>
+  </div>
+  <div class="evidence-caption">Hibernate's <code>DataIntegrityViolationException</code> (raised by the unique index on <code>BOOK.ISBN</code>) is intercepted by <code>GlobalExceptionHandler</code> and rendered as a clean page.</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- =================== 5. TESTING =================== -->
+<h2>5. Testing — JUnit 5 + Mockito</h2>
+
+<p>
+The project includes <strong>10 unit tests</strong> across 3 test classes,
+all passing. Repository tests use <code>@DataJpaTest</code> with an in-memory
+H2 instance to verify the inner-join query against a real (test-only)
+schema. Service tests use Mockito with <code>@InjectMocks</code> to isolate
+the service from the JPA layer.
+</p>
+
+<table>
+  <tr><th>Test class</th><th>Tests</th><th>What it verifies</th></tr>
+  <tr><td><code>BookRepositoryTest</code> (<code>@DataJpaTest</code>)</td><td>2</td>
+      <td>The custom INNER JOIN query joins correctly, drops authors with no books, and orders by author name then title.</td></tr>
+  <tr><td><code>BookServiceTest</code> (Mockito)</td><td>5</td>
+      <td><code>create</code> attaches the right author and persists; <code>update</code> overwrites fields; missing ids throw; <code>findAllJoined</code> delegates to the repository.</td></tr>
+  <tr><td><code>AuthorServiceTest</code> (Mockito)</td><td>3</td>
+      <td>Service correctly delegates to the repository, and propagates errors when an author is not found.</td></tr>
+</table>
+
+<span class="filename">BookRepositoryTest.java</span>
+<pre>@DataJpaTest
+@TestPropertySource(properties = {
+        "spring.sql.init.mode=never",
+        "spring.jpa.defer-datasource-initialization=false"
+})
+class BookRepositoryTest {
+
+    @Autowired private TestEntityManager em;
+    @Autowired private BookRepository bookRepository;
+
+    @Test
+    void findAllBooksWithAuthor_returnsInnerJoinedRows() {
+        Author orwell = em.persist(new Author("George Orwell", "British", 1903));
+        Author austen = em.persist(new Author("Jane Austen", "British", 1775));
+        // Author with NO books -- inner join must drop them
+        em.persist(new Author("Author With No Books", "Nowhere", 1900));
+
+        em.persist(new Book("1984",                "ISBN-A", new BigDecimal("9.99"), orwell));
+        em.persist(new Book("Animal Farm",         "ISBN-B", new BigDecimal("7.50"), orwell));
+        em.persist(new Book("Pride and Prejudice", "ISBN-C", new BigDecimal("6.95"), austen));
+        em.flush();
+
+        List&lt;BookWithAuthor&gt; result = bookRepository.findAllBooksWithAuthor();
+
+        assertThat(result).hasSize(3);
+        // Ordered by author name then title (G &lt; J alphabetically)
+        assertThat(result.get(0).getAuthorName()).isEqualTo("George Orwell");
+        assertThat(result.get(0).getTitle()).isEqualTo("1984");
+        assertThat(result.get(1).getAuthorName()).isEqualTo("George Orwell");
+        assertThat(result.get(1).getTitle()).isEqualTo("Animal Farm");
+        assertThat(result.get(2).getAuthorName()).isEqualTo("Jane Austen");
+        assertThat(result.get(2).getTitle()).isEqualTo("Pride and Prejudice");
+
+        // Author with no books must NOT appear (inner join semantics)
+        assertThat(result).noneMatch(r -&gt; r.getAuthorName().equals("Author With No Books"));
+    }
+
+    @Test
+    void findAllBooksWithAuthor_emptyWhenNoBooks() {
+        em.persist(new Author("Lonely Author", "Atlantis", 1900));
+        em.flush();
+        assertThat(bookRepository.findAllBooksWithAuthor()).isEmpty();
+    }
+}</pre>
+
+<span class="filename">BookServiceTest.java (excerpts)</span>
+<pre>@ExtendWith(MockitoExtension.class)
+class BookServiceTest {
+
+    @Mock private BookRepository bookRepository;
+    @Mock private AuthorRepository authorRepository;
+    @InjectMocks private BookService bookService;
+
+    @Test
+    void create_attachesAuthorAndPersists() {
+        Book input = new Book("New Title", "ISBN-X", new BigDecimal("12.50"), null);
+        when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
+        when(bookRepository.save(any(Book.class))).thenAnswer(inv -&gt; inv.getArgument(0));
+
+        Book saved = bookService.create(input, 1L);
+
+        assertThat(saved.getAuthor()).isSameAs(author);
+        verify(bookRepository).save(input);
+    }
+
+    @Test
+    void create_unknownAuthor_throws() {
+        when(authorRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -&gt; bookService.create(new Book(), 99L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Author not found");
+        verify(bookRepository, never()).save(any());
+    }
+
+    @Test
+    void update_missingBook_throws() {
+        when(bookRepository.findById(404L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -&gt; bookService.update(404L, new Book(), 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Book not found");
+    }
+}</pre>
+
+<div class="evidence">
+  <div class="evidence-title">Output 10 — <code>mvn test</code> output (all 10 tests green)</div>
+  <pre class="terminal"><span class="prompt">$</span> mvn test
+<span class="dim">[INFO] Scanning for projects...</span>
+<span class="dim">[INFO] -------------------------&lt; com.example:library &gt;-------------------------</span>
+<span class="dim">[INFO] Building library 1.0.0</span>
+<span class="dim">[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) ---</span>
+<span class="dim">[INFO] Compiling 12 source files with javac [debug parameters release 21]</span>
+<span class="dim">[INFO] --- maven-surefire-plugin:3.2.5:test (default-test) ---</span>
+<span class="info">[INFO] Running com.example.library.repository.BookRepositoryTest</span>
+<span class="ok">[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.755 s</span>
+<span class="info">[INFO] Running com.example.library.service.BookServiceTest</span>
+<span class="ok">[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.223 s</span>
+<span class="info">[INFO] Running com.example.library.service.AuthorServiceTest</span>
+<span class="ok">[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s</span>
+[INFO]
+[INFO] Results:
+[INFO]
+<span class="ok">[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0</span>
+[INFO]
+<span class="ok">[INFO] BUILD SUCCESS</span>
+<span class="dim">[INFO] ------------------------------------------------------------------------</span>
+<span class="dim">[INFO] Total time:  7.541 s</span></pre>
+  <div class="evidence-caption">All 10 tests across 3 test classes pass; the build succeeds.</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- =================== 6. CHALLENGES =================== -->
+<h2>6. Challenges Faced</h2>
+
+<h4>1. JSP with Spring Boot 3 (Jakarta migration)</h4>
+<p>
+Spring Boot 3 moved to the <strong>Jakarta EE</strong> namespace. The JSTL imports
+in JSP files now use <code>jakarta.tags.core</code> instead of the older
+<code>http://java.sun.com/jsp/jstl/core</code> URI, and the JSTL implementation
+artifact had to be <code>org.glassfish.web:jakarta.servlet.jsp.jstl</code>.
+Additionally, JSPs cannot be packaged inside a Spring Boot fat-jar — the app
+must be launched with <code>mvn spring-boot:run</code> so the JSP files in
+<code>src/main/webapp/</code> are picked up by the embedded Tomcat.
+</p>
+
+<h4>2. <code>data.sql</code> running before the schema existed</h4>
+<p>
+On the first run, the seed inserts failed because Spring tried to execute
+<code>data.sql</code> <em>before</em> Hibernate had created the tables.
+Setting <code>spring.jpa.defer-datasource-initialization=true</code> (and
+<code>spring.sql.init.mode=always</code>) re-orders the lifecycle so the
+schema is created first.
+</p>
+
+<h4>3. Designing the inner-join query without N+1 fetches</h4>
+<p>
+A naive approach would be to return <code>List&lt;Book&gt;</code> and access
+<code>book.getAuthor().getName()</code> inside the JSP, which would trigger
+one extra query per book (the N+1 problem). Instead, I used JPQL's
+<code>SELECT new com.example.library.dto.BookWithAuthor(...)</code>
+constructor expression to project the join straight into a DTO — a single
+INNER JOIN query that returns everything the view needs.
+</p>
+
+<h4>4. Validation order vs. controller binding</h4>
+<p>
+The first version of <code>Book</code> had <code>@NotNull</code> on the
+<code>author</code> field, which fired during <code>@Valid</code> validation
+<em>before</em> the controller had a chance to resolve the
+<code>authorId</code> form parameter to an <code>Author</code> entity. The
+fix was to keep the database-level constraint
+(<code>@JoinColumn(nullable=false)</code>) but remove the
+<code>@NotNull</code> bean-validation annotation — the controller does the
+manual <code>rejectValue</code> when no author is selected.
+</p>
+
+<h4>5. User-friendly errors</h4>
+<p>
+Hibernate's raw <code>DataIntegrityViolationException</code> message is not
+user-friendly. A <code>@ControllerAdvice</code> translates it into a clean
+<code>error.jsp</code> page with the duplicate-ISBN reason explained, while
+still surfacing the underlying SQL detail for the developer.
+</p>
+
+<!-- =================== 7. HOW TO RUN =================== -->
+<h2>7. How to Run</h2>
+
+<h4>Prerequisites</h4>
+<ul>
+  <li>Java 21 (Temurin or any OpenJDK 21 build)</li>
+  <li>Maven 3.9+</li>
+</ul>
+
+<h4>Commands</h4>
+<pre># Run the application (starts on http://localhost:8085)
+mvn spring-boot:run
+
+# Run all unit tests
+mvn test
+
+# Build the project
+mvn -DskipTests package</pre>
+
+<h4>URLs to verify</h4>
+<table>
+  <tr><th>URL</th><th>Purpose</th></tr>
+  <tr><td><code>http://localhost:8085/</code></td><td>Redirects to <code>/books</code></td></tr>
+  <tr><td><code>http://localhost:8085/books</code></td><td>List of all books (uses INNER JOIN query)</td></tr>
+  <tr><td><code>http://localhost:8085/books/new</code></td><td>Add Book form</td></tr>
+  <tr><td><code>http://localhost:8085/books/1/edit</code></td><td>Edit Book form (id=1)</td></tr>
+  <tr><td><code>http://localhost:8085/authors</code></td><td>List of authors</td></tr>
+  <tr><td><code>http://localhost:8085/h2-console</code></td><td>H2 web console (JDBC URL: <code>jdbc:h2:mem:librarydb</code>, user <code>sa</code>, no password)</td></tr>
+</table>
+
+<!-- =================== 8. GITHUB =================== -->
+<h2>8. GitHub Repository</h2>
+
+<p>The complete source code of this project is available at:</p>
+<p style="text-align: center; font-family: monospace; font-size: 13pt; padding: 12pt; background: #f6f8fa; border: 1px dashed #99a3b3;">
+  ___________________________________________________________
+</p>
+<p style="text-align: center; color: #5a6a80; font-size: 10pt;">(Replace with your GitHub URL after pushing)</p>
+
+</body>
+</html>
